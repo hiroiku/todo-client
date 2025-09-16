@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-import { ref } from 'vue'
+import { RouterLink, RouterView } from 'vue-router';
+import HelloWorld from './components/HelloWorld.vue';
+import { ref } from 'vue';
 
-const name = ref('Unknown')
+const name = ref('Unknown');
 
 const getName = async () => {
-  const res = await fetch('/api/')
-  const data = await res.json()
-  name.value = data.name
-}
+  const res = await fetch('/api/');
+  const data = await res.json();
+  name.value = data.name;
+};
 </script>
 
 <template>
@@ -18,13 +18,11 @@ const getName = async () => {
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
-      <button class="green" @click="getName" aria-label="get name">
-        Name from API is: {{ name }}
-      </button>
+      <button class="green" @click="getName" aria-label="get name">Name from API is: {{ name }}</button>
       <p>Edit <code>server/index.ts</code> to change what the API gets</p>
       <nav>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/add-task">Add Task</RouterLink>
       </nav>
     </div>
   </header>
