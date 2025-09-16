@@ -1,38 +1,74 @@
+<script lang="ts" setup>
+import { reactive, ref } from 'vue';
+
+// リアクティブな変数を定義する
+// const title = ref('タイトル');
+// const description = ref('説明');
+
+const taskForm = reactive({
+  title: '',
+  description: '',
+  priority: '',
+  expiresAt: '',
+  tags: '',
+});
+</script>
+
 <template>
   <section :class="$style.container">
+    <pre>{{ taskForm.title }}</pre>
+    <pre>{{ taskForm.description }}</pre>
+    <pre>{{ taskForm.priority }}</pre>
+    <pre>{{ taskForm.expiresAt }}</pre>
+    <pre>{{ taskForm.tags }}</pre>
     <h1 :class="$style.heading">タスクを追加する</h1>
 
     <form :class="$style.form" novalidate>
       <div :class="$style.field">
         <label for="title" :class="$style.label">タスク名</label>
-        <input id="title" :class="$style.input" type="text" inputmode="text" placeholder="タスク名" />
+        <input
+          id="title"
+          :class="$style.input"
+          type="text"
+          inputmode="text"
+          placeholder="タスク名"
+          v-model="taskForm.title"
+        />
       </div>
 
       <div :class="$style.field">
         <label for="description" :class="$style.label">説明</label>
-        <textarea id="description" :class="$style.textarea" rows="4" placeholder="説明を入力"></textarea>
+        <textarea
+          id="description"
+          :class="$style.textarea"
+          rows="4"
+          placeholder="説明を入力"
+          v-model="taskForm.description"
+        ></textarea>
         <p :class="$style.help">任意。詳細やメモを記載</p>
       </div>
 
       <div :class="$style.fieldInline">
         <div :class="$style.field">
           <label for="priority" :class="$style.label">優先度</label>
-          <select id="priority" :class="$style.select">
+          <select id="priority" :class="$style.select" v-model="taskForm.priority">
+            <option value="">-</option>
             <option value="low">低</option>
             <option value="medium">中</option>
             <option value="high">高</option>
+            <option value="urgent">緊急</option>
           </select>
         </div>
 
         <div :class="$style.field">
           <label for="due" :class="$style.label">期限</label>
-          <input id="due" :class="$style.input" type="date" placeholder="YYYY-MM-DD" />
+          <input id="due" :class="$style.input" type="date" placeholder="YYYY-MM-DD" v-model="taskForm.expiresAt" />
         </div>
       </div>
 
       <div :class="$style.field">
         <label for="tags" :class="$style.label">タグ</label>
-        <input id="tags" :class="$style.input" type="text" placeholder="例: work, urgent" />
+        <input id="tags" :class="$style.input" type="text" placeholder="例: work, urgent" v-model="taskForm.tags" />
         <p :class="$style.help">カンマ区切りで入力</p>
       </div>
 
