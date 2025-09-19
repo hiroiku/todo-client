@@ -305,13 +305,13 @@ function clearForm() {
 
 .alertSuccess {
   background: hsla(160, 84%, 39%, 0.12);
-  color: hsla(160, 84%, 20%, 1);
+  color: hsla(160, 84%, 34%, 1);
   border-color: hsla(160, 84%, 39%, 0.35);
 }
 
 .alertError {
   background: rgba(200, 81, 81, 0.12);
-  color: #7e2424;
+  color: #c85151;
   border-color: rgba(200, 81, 81, 0.35);
 }
 
