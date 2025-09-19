@@ -12,15 +12,54 @@ const taskForm = reactive({
   expiresAt: '',
   tags: '',
 });
+
+const status = ref<'idle' | 'pending' | 'success' | 'error'>('idle');
+
+async function addTask() {
+  status.value = 'pending';
+
+  const requestUrl = 'http://localhost:8787/api/v1/tasks';
+  const response = await fetch(requestUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      title: taskForm.title,
+      description: taskForm.description,
+      priority: taskForm.priority || undefined,
+      expiresAt: taskForm.expiresAt || undefined,
+      tags: taskForm.tags
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(Boolean),
+    }),
+  });
+
+  // HTTP ステータスコードが 200 以外の場合
+  if (!response.ok) {
+    status.value = 'error';
+    return;
+  }
+
+  // レスポンスのボディを JSON オブジェクトにパース
+  const data = await response.json();
+  console.log(data);
+
+  status.value = 'success';
+}
+
+function clearForm() {
+  taskForm.title = '';
+  taskForm.description = '';
+  taskForm.priority = '';
+  taskForm.expiresAt = '';
+  taskForm.tags = '';
+}
 </script>
 
 <template>
   <section :class="$style.container">
-    <pre>{{ taskForm.title }}</pre>
-    <pre>{{ taskForm.description }}</pre>
-    <pre>{{ taskForm.priority }}</pre>
-    <pre>{{ taskForm.expiresAt }}</pre>
-    <pre>{{ taskForm.tags }}</pre>
     <h1 :class="$style.heading">タスクを追加する</h1>
 
     <form :class="$style.form" novalidate>
@@ -73,9 +112,63 @@ const taskForm = reactive({
       </div>
 
       <div :class="$style.actions">
-        <button :class="[$style.button, $style.primary]" type="button">追加</button>
-        <button :class="[$style.button, $style.ghost]" type="button">クリア</button>
+        <button
+          :class="[$style.button, $style.primary]"
+          type="button"
+          :disabled="status === 'pending'"
+          @click="addTask"
+        >
+          追加
+        </button>
+        <button :class="[$style.button, $style.ghost]" type="button" @click="clearForm">クリア</button>
       </div>
+
+      <Transition name="alert">
+        <div
+          v-if="status === 'success'"
+          :class="[$style.alert, $style.alertSuccess]"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <svg
+            :class="$style.alertIcon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            aria-hidden="true"
+          >
+            <path
+              fill="currentColor"
+              d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.05 13.29-3.2-3.2a1 1 0 0 1 1.41-1.41l2.49 2.49 4.49-4.49a1 1 0 1 1 1.41 1.41l-5.2 5.2a1 1 0 0 1-1.4 0Z"
+            />
+          </svg>
+          <p :class="$style.alertText">タスクを作成しました</p>
+        </div>
+      </Transition>
+
+      <Transition name="alert">
+        <div
+          v-if="status === 'error'"
+          :class="[$style.alert, $style.alertError]"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
+          <svg
+            :class="$style.alertIcon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            aria-hidden="true"
+          >
+            <path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 14h-2v-2h2v2Zm0-4h-2V6h2v6Z" />
+          </svg>
+          <p :class="$style.alertText">タスクの作成に失敗しました</p>
+        </div>
+      </Transition>
     </form>
   </section>
 </template>
@@ -187,5 +280,50 @@ const taskForm = reactive({
   background-color: transparent;
   color: var(--color-text);
   border: 1px solid var(--color-border);
+}
+
+/* Alert */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+}
+
+.alertIcon {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.alertText {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.alertSuccess {
+  background: hsla(160, 84%, 39%, 0.12);
+  color: hsla(160, 84%, 20%, 1);
+  border-color: hsla(160, 84%, 39%, 0.35);
+}
+
+.alertError {
+  background: rgba(200, 81, 81, 0.12);
+  color: #7e2424;
+  border-color: rgba(200, 81, 81, 0.35);
+}
+
+/* Transition */
+.alert-enter-active,
+.alert-leave-active {
+  transition: all 180ms ease;
+}
+
+.alert-enter-from,
+.alert-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 </style>
